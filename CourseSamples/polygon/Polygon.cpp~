@@ -1,0 +1,134 @@
+// object1.cpp
+
+// Program to draw a k-gon, where k is a command-line parameter
+// Adapted from Angel & Shreiner 2D Sierpinski Gasket program
+
+
+#include "/usr/people/classes/CS321/include/Angel.h"
+
+int k; // the number of sides in the polygon
+int NumPoints;
+
+//----------------------------------------------------------------------------
+
+/**
+ * Fills the array points, starting at index i, with the vertices of triangles
+ * forming a unit radius k-gon centered at the origin.
+ * The array points must contain at least 3k+i elements.
+ * 
+ * @param k the number of sides of the polygon
+ * @param points the array to put the vertices of the triangles into
+ * @param i the starting position of the array to put the points into
+ */
+void
+polygon( int k, vec2 *points, int i )
+{
+
+    vec2 origin   = vec2(0.0, 0.0);
+    vec2 start    = vec2(1.0, 0.0);
+    vec2 p1       = start;
+    GLfloat theta = 2.0 * M_PI / k;
+    
+    for (int j = 1; j < k; j++) {
+        vec2 p2 = vec2(cos(j * theta), sin(j * theta));
+        points[i++] = origin;
+        points[i++] = p1;
+        points[i++] = p2;
+        p1 = p2;
+    }
+    points[i++] = origin;
+    points[i++] = p1;
+    points[i++] = start;
+}
+
+void
+init( void )
+{
+    NumPoints = 3 * k;
+    vec2 *points = new vec2[NumPoints];
+    polygon( k, points, 0 );
+
+    // Create a vertex array object
+    GLuint vao;
+    glGenVertexArrays( 1, &vao );
+    glBindVertexArray( vao );
+
+    // Create and initialize a buffer object
+    GLuint buffer;
+    glGenBuffers( 1, &buffer );
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );
+    glBufferData( GL_ARRAY_BUFFER, NumPoints * sizeof(vec2), points, GL_STATIC_DRAW );
+
+    // Load shaders and use the resulting shader program
+    GLuint program = InitShader( "Polygon_vs.glsl", "Polygon_fs.glsl" );
+    glUseProgram( program );
+
+    // Initialize the vertex position attribute from the vertex shader
+    GLuint loc = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( loc );
+    glVertexAttribPointer( loc, 2, GL_FLOAT, GL_FALSE, 0,
+                           BUFFER_OFFSET(0) );
+
+    glClearColor( 0.0, 0.0, 1.0, 1.0 ); // blue background
+}
+
+//----------------------------------------------------------------------------
+
+void
+display( void )
+{
+    glClear( GL_COLOR_BUFFER_BIT );     // clear the window
+    glDrawArrays( GL_TRIANGLES, 0, NumPoints );    // draw the points
+    glFlush();
+}
+
+//----------------------------------------------------------------------------
+
+void
+keyboard( unsigned char key, int x, int y )
+{
+    switch ( key ) {
+    case 033:                 // Escape key exits program
+        exit( EXIT_SUCCESS );
+        break;
+    }
+}
+
+//----------------------------------------------------------------------------
+
+int
+main( int argc, char **argv )
+{
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s k\n", argv[0]);
+        exit( EXIT_FAILURE );
+    }
+    k = atoi(argv[1]);
+    if (k < 3 || k > 1024) {
+        fprintf(stderr, "Error: range limit of k is 3 ... 1024\n");
+        exit( EXIT_FAILURE );
+    }
+
+    glutInit( &argc, argv );
+    glutInitDisplayMode( GLUT_RGBA );
+    glutInitWindowSize( 512, 512 );
+
+    // If you are using freeglut, the next two lines will check if 
+    // the code is truly 3.2. Otherwise, comment them out
+    
+    glutInitContextVersion( 3, 2 );
+    glutInitContextProfile( GLUT_CORE_PROFILE );
+
+    glutCreateWindow( "Polygon" );
+
+    glewExperimental = GL_TRUE;
+    glewInit();
+
+    init();
+
+    glutDisplayFunc( display );
+    glutKeyboardFunc( keyboard );
+
+    glutMainLoop();
+    return EXIT_SUCCESS;
+}
