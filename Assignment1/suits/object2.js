@@ -60,12 +60,60 @@ window.onload = function init()
     points.push(triaVertices[4 ]);
     points.push(triaVertices[5 ]);
 
+
+    var heartVertices = [
+        vec2(.5,-0.9),
+        vec2(.2,-0.5),
+        vec2(.8,-0.5),
+
+        vec2(.5,-.5),
+        vec2(.35,-.2),
+        vec2(.2,-.5),
+
+        vec2(.5,-.5),
+        vec2(.65,-.2),
+        vec2(.8,-.5)
+    ];
+
+    //set up heart
+    points.push( heartVertices[ 0] );
+    points.push( heartVertices[ 1] );
+    points.push( heartVertices[ 2] );
+
+    points.push( heartVertices[ 5]);
+    points.push( heartVertices[ 3] );
+    points.push( heartVertices[ 4] );
+
+    points.push( heartVertices[ 6]);
+    points.push( heartVertices[ 7] );
+    points.push( heartVertices[ 8] );
+
     //Initialize Club
 
     var clubVertices = [
         vec2( -0.4, -0.9 ), //  0
         vec2( -0.6, -0.9 ), //  1
         vec2( -0.5, -0.8 ), //  2
+
+        vec2( -0.4, -0.8 ), 
+        vec2( -0.4, -0.6 ), 
+        vec2( -0.6, -0.8 ),
+
+        vec2( -0.6, -0.6 ), 
+        vec2( -0.4, -0.6 ), 
+        vec2( -0.6, -0.8 ),
+
+        vec2( -0.6, -0.6 ), 
+        vec2( -0.8, -0.7 ), 
+        vec2( -0.6, -0.8 ),
+
+        vec2( -0.4, -0.8 ), 
+        vec2( -0.4, -0.6 ), 
+        vec2( -0.2, -0.7 ),
+
+        vec2( -0.4, -0.6 ), 
+        vec2( -0.6, -0.6 ), 
+        vec2( -0.5, -0.4 )
     ];
 
     //Set up the club
@@ -73,6 +121,25 @@ window.onload = function init()
     points.push( clubVertices[ 1] );
     points.push( clubVertices[ 2] );
 
+    points.push( clubVertices[ 3] );
+    points.push( clubVertices[ 4] );
+    points.push( clubVertices[ 5] );
+
+    points.push( clubVertices[ 6] );
+    points.push( clubVertices[ 7] );
+    points.push( clubVertices[ 8] );
+
+    points.push( clubVertices[ 9] );
+    points.push( clubVertices[ 10] );
+    points.push( clubVertices[ 11] );
+
+    points.push( clubVertices[ 12] );
+    points.push( clubVertices[ 13] );
+    points.push( clubVertices[ 14] );
+
+    points.push( clubVertices[ 15] );
+    points.push( clubVertices[ 16] );
+    points.push( clubVertices[ 17] );
     //
     //  Configure WebGL
     //
@@ -106,8 +173,10 @@ function render() {
     var numQuadPoints = 6;
     var startTriangle = numQuadPoints;
     var numTriaPoints = 6;
-    var startClub     = numTriaPoints;
-    var numClubPoints = 3;
+    var startHeart    = numQuadPoints+numTriaPoints;
+    var numHeartPoints= 9;
+    var startClub     = numTriaPoints+numQuadPoints+numHeartPoints;
+    var numClubPoints = 18;
 
     var red = vec4( 2.0, 0.0, 0.0, 1.0 );
     var black  = vec4( 0.0, 0.0, 0.0, 1.0 );
@@ -122,6 +191,9 @@ function render() {
     // draw the triangle
     gl.uniform4fv( currentColorLoc, black );
     gl.drawArrays( gl.TRIANGLES, startTriangle, numTriaPoints );
+
+    gl.uniform4fv( currentColorLoc, red);
+    gl.drawArrays(gl.TRIANGLES, startHeart, numHeartPoints);
 
     //draw the club
     gl.uniform4fv( currentColorLoc, black );
