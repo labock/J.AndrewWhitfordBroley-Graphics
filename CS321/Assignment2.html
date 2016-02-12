@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>CSCI 321&mdash;Programming Assignment 2</title>
+
+  
+</head>
+
+<body style="color: rgb(0, 8, 96); background-color: rgb(255, 239, 191);">
+
+<h2>
+CSCI 321&mdash;Graphics</h2>
+
+<h4>Assignment 2: due Wednesday, February 10, 2016</h4>
+
+<p>
+The purpose of this assignment is to help you become familiar with
+event handling and
+3D modeling in WebGL<sup><font size="-2">&reg;</font></sup>.</p>
+
+<p>
+This assignment is worth 5 points.</p>
+
+<p>
+To submit the assignment, turn in a one page description of what you have done,
+including the names of the programs you want me to evaluate,
+to what extent you believe they are complete, how to use them,
+and brief comments on your experiences with them.
+Submit the cover sheet in text, Word or PDF format.
+I won't be grading the cover sheet <i>per se</i>,
+but I will appreciate reasonably good writing.
+Keep your project files protected in your own directories.
+Put all the files for this assignment in a directory named
+<em>&lt;your last name&gt;.&lt;your given name&gt;.CS321.Assignment2</em>
+and copy it into the <em>/usr/people/handins/CS321</em> directory.
+This is an <i>individual</i> programming assignment;
+however, you may consult with other students as long as the
+work you submit is substantially your own.</p>
+
+<ol>
+<li>Using one of your 2D shape programs from Assignment 1 and
+    the polygon program in the class sample programs as models,
+    write a WebGl program that has a number input box and displays
+    one to five copies of the shape across the canvas, depending
+    on the value in the input box.
+    You'll probably need to make the shape smaller to accommodate
+    multiple objects;
+    you can put the objects wherever on the canvas is convenient.
+    The easiest way to do this is to pre-compute all five shapes
+    and put all of them in the buffer, consecutively, and then
+    use the render function to control how much of the buffer gets
+    displayed;
+    this way, you don't have to recompute the points or change the
+    buffer every time the value in the input box changes.</li><br>
+
+<li>Starting with your card suit program from Assignment 1, first
+    try to improve your shapes if they're not recognizable as card
+    suits or if you just think they should look better.
+    Now modify the program so that the four suit symbols are displayed
+    in dim versions of their colors until you click on one of the
+    shapes, at which time it is displayed in full color.
+    (Only one shape should be full color at a time, so clicking on
+    a different shape should brighten that shape and dim any shape
+    that is bright.)
+    Define clicking on a shape to be anywhere in the bounding rectangle of
+    the shape;
+    clicking anywhere else in the canvas should dim all four shapes.</li><br>
+
+<li>Using the sample file <em>holeyShapes.js</em> as a model,
+    start your own <em>shapes</em> file, and write functions to
+    generate at least three different 3D shapes, not too similar
+    to the ones in <em>holeyShapes.js</em>.
+    In each case, the shape should be the full surface of a
+    solid object, created as a sequence of outward-facing
+    triangles;
+    at least one of the shapes should be a non-convex object.
+    Here are some suggestions:
+    <ul>
+        <li>a skewed cube with parameters for the degree of skewing
+		    in each x-, y- and z-direction;
+		    for example, if the x-skew is 0.25 and the other two skews
+		    are 0.0, the front coordinates would be (-1.25, -1.0, 1.0, 1.0),
+		    (-0.75, 1.0, 1.0, 1.0), (1.25, 1.0, 1.0, 1.0) and
+		    (0.75, -1.0, 1.0, 1.0).
+		    Don't worry about the problem of a shape too big for the viewing
+		    volume if you choose this one.</li>
+        <li>a dimpled cube, with each square face divided into four
+		    triangles, meeting at the center, and each center point
+		    pushed in our pulled out a little;
+		    an array parameter with six elements can be used to
+		    determine how far each center is to be pushed in or out</li>
+	    <li>a 3D lightening bolt (at least three segments) with a
+	        triangular cross-section and one end coming to a point</li>
+	    <li>a 3D star made of six square-based pyramids, their
+	        bases forming a cube in the center and their apexes
+	        (or apices) lying on the coordinate axes;
+	        it's not necessary to draw the pyramid bases, since they're
+	        internal to the star</li>
+ 	 </ul>
+ 	 For each of your shapes, write a test program, similar to
+ 	 <em>doublePyramid</em> that displays the shape with randomly
+ 	 assigned colors on each triangle.
+ 	 Add two buttons to the program, one of which scales the shape to a
+ 	 larger size than its current size, and one of which scales it smaller.
+ 	 It's not necessary to have an input box in your test programs.</li><br>
+
+<li>Using the <em>pyramid</em> and <em>spherichedron</em>
+    functions in the <em>holeyShapes</em> as models,
+    draw a 3D playing-card club, consisting of a
+    conical base and three spherical balls.
+    Use enough subdivisions that the object looks almost curved, but
+    not so that the facets disappear.
+    Experiment with color ranges to get something that looks black,
+    but still 3D;
+    maybe start with black to medium gray.
+    Using the author's cube program as a model, animate the club to rotate
+    around the y-axis.</li>
+
+</ol>
+

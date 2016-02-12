@@ -1,0 +1,468 @@
+/*
+ * File: holeyShapes.js
+ */
+
+/**
+ * File with functions to generate a variety of useful 3D shapes for use
+ * in WebGL, and a few functions to generate colors.
+ * Each shape is generated as a sequence of triangles in an array of 4D points.
+ * It uses several basic definitions from the script "MV.js", supplied with the
+ * Angel & Shriener textbook, Interactive Computer Graphics, 7th Edition,
+ * which should be sourced in the host HTML file before sourcing this page.<br>
+ *
+ * Each shape function takes an array of vec4 points
+ * and in some cases additional parameters;
+ * it returns the number of points.
+ * It appends the generated vertices to the array points.
+ *
+ * Individual functions from this file may be added to others' code,
+ * provided that authorship and version information is retained.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ */
+
+
+/**
+ * Generates a cube with unit coordinates and appends the vertices as triangles
+ * to the specified array of points.
+ * This code is adapted from code by Angel & Shriener from their book
+ * Interactive Computer Graphics, 7th Edition.
+ * This cube requires 36 vertices in the array points.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   points the array to append the points to
+ * @return  the number of points appended (36)
+ */
+function cube( points ) {
+
+  const numFaces     = 6;
+  const vertsPerFace = 6;
+
+  var vertices = [
+    vec4( -1.0, -1.0,  1.0,  1.0 ), // 0
+    vec4( -1.0,  1.0,  1.0,  1.0 ), // 1
+    vec4(  1.0,  1.0,  1.0,  1.0 ), // 2
+    vec4(  1.0, -1.0,  1.0,  1.0 ), // 3
+    vec4( -1.0, -1.0, -1.0,  1.0 ), // 4
+    vec4( -1.0,  1.0, -1.0,  1.0 ), // 5
+    vec4(  1.0,  1.0, -1.0,  1.0 ), // 6
+    vec4(  1.0, -1.0, -1.0,  1.0 )  // 7
+  ];
+
+  var faceIndices = [
+    [ 1, 0, 3, 2 ], // 0  front face
+    [ 2, 3, 7, 6 ], // 1  right face
+    [ 3, 0, 4, 7 ], // 2  bottom face
+    [ 6, 5, 1, 2 ], // 3  top face
+    [ 4, 5, 6, 7 ], // 4  back face
+    [ 5, 4, 0, 1 ]  // 5  left face
+  ];
+
+  for ( i = 0; i < numFaces; i++ ) {
+    points.push( vertices[faceIndices[i][0]] );
+    points.push( vertices[faceIndices[i][1]] );
+    points.push( vertices[faceIndices[i][2]] );
+    points.push( vertices[faceIndices[i][0]] );
+    points.push( vertices[faceIndices[i][2]] );
+    points.push( vertices[faceIndices[i][3]] );
+  }
+  return vertsPerFace * numFaces;
+}
+
+/**
+ * Generate a pyramid with a unit-radius k-gon base,
+ * centered at the origin in the xz-plane, and an
+ * apex at (0, 1, 0, 1).
+ * A pyramid requires 6*k vertices in the array points.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   points the array to append the points to
+ * @param   k      the number of vertices in the base
+ * @return  the number of points appended (6 * k)
+ */
+function pyramid( points, k ) {
+
+  var apex          = vec4( 0.0, 1.0, 0.0, 1.0);
+  var baseCenter    = vec4( 0.0, 0.0, 0.0, 1.0);
+  var baseVertices  = [];
+  var vertsPerSlice = 6; // base triangle and side triangle
+
+  var theta = 2.0 * Math.PI / k;
+  for ( i = 0; i < k; i++ ) {
+    var angle = i * theta;
+    baseVertices.push( vec4( Math.cos(angle), 0.0, Math.sin(angle), 1.0));
+  }
+
+  for (i = 0; i < k-1; i++ ) {
+    points.push( baseCenter );
+    points.push( baseVertices[i] );
+    points.push( baseVertices[i+1] );
+    points.push( apex );
+    points.push( baseVertices[i+1] );
+    points.push( baseVertices[i] );
+  }
+  points.push( baseCenter );
+  points.push( baseVertices[k-1] );
+  points.push( baseVertices[0] );
+  points.push( apex );
+  points.push( baseVertices[0] );
+  points.push( baseVertices[k-1] );
+
+  return vertsPerSlice * k;
+}
+
+/**
+ * Generate a cylinder with a unit-radius k-gon base;
+ * the cylinder is vertical, with the bases in the
+ * y = -1 and y = 1 planes.
+ * A cylinder requires 12*k vertices in the array points.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   points the array to append the points to
+ * @param   k      the number of vertices in the base
+ * @return  the number of points appended (12 * k)
+ */
+function cylinder( points, k ) {
+
+  var topCenter      = vec4( 0.0,  1.0, 0.0, 1.0);
+  var bottomCenter   = vec4( 0.0, -1.0, 0.0, 1.0);
+  var topVertices    = [];
+  var bottomVertices = [];
+  var vertsPerSlice  = 12; // bottom and top triangles and two side triangles
+
+  var theta = 2.0 * Math.PI / k;
+  for (i = 0; i < k; i++) {
+    var angle = i * theta;
+    topVertices.push   ( vec4( Math.cos(angle),  1.0, Math.sin(angle), 1.0));
+    bottomVertices.push( vec4( Math.cos(angle), -1.0, Math.sin(angle), 1.0));
+  }
+
+  for (i = 0; i < k-1; i++ ) {
+    // triangle for bottom base
+    points.push( bottomCenter );
+    points.push( bottomVertices[i] );
+    points.push( bottomVertices[i+1] );
+    // triangle for top base
+    points.push( topCenter );
+    points.push( topVertices[i+1] );
+    points.push( topVertices[i] );
+    // triangles for side rectangle
+    points.push( bottomVertices[i] );
+    points.push( topVertices[i] );
+    points.push( topVertices[i+1] );
+    points.push( bottomVertices[i] );
+    points.push( topVertices[i+1] );
+    points.push( bottomVertices[i+1] );
+  }
+  // last bottom triangle
+  points.push( bottomCenter );
+  points.push( bottomVertices[k-1] );
+  points.push( bottomVertices[0] );
+  // last top triangle
+  points.push( topCenter );
+  points.push( topVertices[0] );
+  points.push( topVertices[k-1] );
+  // last side triangles
+  points.push( bottomVertices[k-1] );
+  points.push( topVertices[k-1] );
+  points.push( topVertices[0] );
+  points.push( bottomVertices[k-1] );
+  points.push( topVertices[0] );
+  points.push( bottomVertices[0] );
+
+  return vertsPerSlice * k;
+}
+
+
+/**
+ * Create a point 1.0 units from the origin
+ * on the same line as the line between p and the origin.
+ * Returns the new point unless p is too close to the
+ * origin, in which case it returns p.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   p a vec4 point not "too close" to the origin
+ * @return  a point 1.0 units from the origin
+ *          on the same line as the line between p and the origin
+ */
+function unitPoint( p ) {
+  var divideByZeroTolerance = 2.0 / Number.MAX_VALUE;
+      // division shouldn't overflow with this value
+
+  var lenSqrd = p[0]*p[0] + p[1]*p[1] + p[1]*p[1];
+  var result  = p;
+  if (lenSqrd > divideByZeroTolerance) {
+    var len = Math.sqrt(lenSqrd);
+    result /= len;
+    result[3] = 1.0;
+  }
+  return result;
+}
+
+/**
+ * Recursively divides the triangle specified by
+ * vertices a, b, c into 4 triangles divs times,
+ * appends the vertices of the resulting triangles to points, and.
+ * returns the number of vertices appended to points ( 3 * 4^divs ).
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   a, b, c three vec4 vertices defining a triangle
+ *                  (i.e., they are not collinear)
+ * @param   divs    the number of (recursive) divisions to make
+ * @param   points  the array of points to append the divided triangles to
+ * @return  the number of vertices appended to points (
+ */
+function divideTriangle( a, b, c, divs, points ) {
+  var result;
+  if (divs > 0) { // subdivide the triangle into four
+    // find the unit distance points midway between the vertices a, b, and c
+    var v1 = unitPoint(add(a, b));
+    var v2 = unitPoint(add(a, c));
+    var v3 = unitPoint(add(b, c));
+
+    // subdivide the four resulting triangles
+    divideTriangle(  a, v1, v2, divs-1, points );
+    divideTriangle(  c, v2, v3, divs-1, points );
+    divideTriangle(  b, v3, v1, divs-1, points );
+    result = 4 * divideTriangle( v1, v3, v2, divs-1, points );
+
+  } else { // divs == 0; append this triangle to points
+    points.push( a );
+    points.push( b );
+    points.push( c );
+    result = 3;
+  }
+  return result;
+}
+
+
+/**
+ * Generate a spherical polyhedron with vertices at
+ * unit radius, centered at the origin.
+ * This function generates the polyhedron by recursively
+ * subdividing the faces of an octohedron; if
+ * divs is 0, it generates the original octohedron.
+ * The generated vertices are appended to points as triangles,
+ * and the number of vertices generated is returned.
+ * The number of vertices appended to points and
+ * the number of edges around the circumference are as follows:
+ *
+ *   divs     points       edges around circumference
+ *     0         24            4
+ *     1         96            8
+ *     2        384           16
+ *     3       1536           32
+ *     4       6144           64
+ *     k         24 * 4^k      4 * 2^k
+ *
+ * Note that with smooth shading, divs = 4 is probably enough
+ * to approximate a sphere for most purposes.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   divs    the number of (recursive) divisions to make
+ * @param   points  the array of points to append the divided triangles to
+ * @return  the number of vertices appended to points ( 24 * 4^divs )
+ */
+function spherichedron( divs, points ) {
+
+  var numFaces     = 8;
+  var pointsPerFace;
+
+  var vertices = [
+    vec4(  0.0,  1.0,  0.0,  1.0 ), // 0 top
+    vec4(  0.0,  0.0,  1.0,  1.0 ), // 1 front
+    vec4(  1.0,  0.0,  0.0,  1.0 ), // 2 right
+    vec4(  0.0,  0.0, -1.0,  1.0 ), // 3 back
+    vec4( -1.0,  0.0,  0.0,  1.0 ), // 4 left
+    vec4(  0.0, -1.0,  0.0,  1.0 ), // 5 bottom
+  ];
+
+  var faceIndices = [
+    [ 0, 1, 2 ], // 0  upper right front face
+    [ 0, 2, 3 ], // 1  upper right  rear face
+    [ 0, 3, 4 ], // 2  upper  left  rear face
+    [ 0, 4, 1 ], // 3  upper  left front face
+    [ 5, 2, 1 ], // 4  lower right front face
+    [ 5, 3, 2 ], // 5  lower right  rear face
+    [ 5, 4, 3 ], // 6  lower  left  rear face
+    [ 5, 1, 4 ], // 7  lower  left front face
+  ];
+
+  for ( i = 0; i < numFaces; i++ ) {
+    pointsPerFace =
+      divideTriangle( vertices[faceIndices[i][0]],
+                      vertices[faceIndices[i][1]],
+                      vertices[faceIndices[i][2]],
+                      divs,
+                      points );
+  }
+  return numFaces * pointsPerFace;
+}
+
+
+
+/**
+ * Generate a random number in the range fMin (inclusive) to fMax (exclusive.
+ * To get a result that includes fMax, choose a slightly larger value than fMax
+ * and clamp the result to fMax.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 18, 2016
+ * @param   fMin  the minimum value (inclusive) of the value to be returned
+ * @param   fMax  the maximum value (exclusive) of the value to be returned
+ * @return  a pseudo-random number x, such that fMin <= x < fMax
+ */
+function fRandom(fMin, fMax) {
+  return fMin + Math.random() * (fMax - fMin);
+}
+
+
+/**
+ * Generates a pseudo-random color with RGBA values between minColor and maxColor.
+ * The component values of minColor and maxColor are clamped between 0.0 and 1.0.
+ * If any component of minColor is greater than the corresponding component
+ * of maxColor, the values of that component are exchanged;
+ * in this case, the result returned may be different than intended.
+ * This function always returns a valid RGBA color.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version February 5, 2016
+ * @param   minColor an RGBA color that specifies the minimum component values
+ *                   of the result (optional)
+ * @param   maxColor an RGBA color that specifies the maximum component values
+ *                   of the result (optional)
+ * @return  the generated color
+ */
+function randomColorMinMax(minColor, maxColor) {
+  var result = vec4(0.0, 0.0, 0.0, 1.0);
+  for (i = 0; i < 4; i++) {
+    if (minColor[i] < 0.0) {
+      minColor[i] = 0.0;
+    } else if (minColor[i] > 1.0) {
+      minColor[i] = 1.0;
+    }
+    if (maxColor[i] < 0.0) {
+      maxColor[i] = 0.0;
+    } else if (maxColor[i] > 1.0) {
+      maxColor[i] = 1.0;
+    }
+    if (minColor[i] > maxColor[i]) {
+      var temp = minColor[i];
+      minColor[i] = maxColor[i];
+      maxColor[i] = temp;
+    }
+    result[i] = fRandom(minColor[i], maxColor[i]);
+  }
+  return result;
+}
+
+/**
+ * Generates a pseudo-random color with RGB values between
+ * 0.0 and 1.0 and an alpha component of 1.0.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version February 5, 2016
+ * @return  the generated color
+ */
+function randomColor() {
+  var black = vec4(0.0, 0.0, 0.0, 1.0);
+  var white = vec4(1.0, 1.0, 1.0, 1.0);
+  return randomColorMinMax(black, white);
+}
+
+
+/**
+ * Generates k random colors and appends them to the array colors.
+ * Returns k.
+ * The generated colors are randomly distributed between black and white,
+ * all with an alpha value of 1.0.
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 20, 2016
+ * @param   k      the number of colors to generate
+ * @param   colors
+ * @return  the number of colors generated (k)
+ */
+function randomColors(k, colors) {
+  for (i = 0; i < k; i++) {
+    colors.push(randomColor());
+  }
+  return k;
+}  
+
+/**
+ * Generates k random colors and appends them to the array colors;
+ * the colors are constrained to be between minColor and maxColor.
+ * The component values of minColor and maxColor are clamped between 0.0 and 1.0.
+ * If any component of minColor is greater than the corresponding component
+ * of maxColor, the values of that component are exchanged;
+ * in this case, the result returned may be different than intended.
+ * Returns the number of points appended (k).
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 22, 2016
+ */
+function randomColorsMinMax(k, colors, minColor, maxColor) {
+
+  // generate the colors
+  for (i = 0; i < k; i++) {
+    colors.push(randomColorMinMax(minColor, maxColor));
+  }
+  return k;
+}
+
+/**
+ * Generates k random sets of dup colors and appends them to the array colors.
+ * That is, it fills colors with k * dup colors, every dup a random color.
+ * The generated colors are randomly distributed between black and white,
+ * all with an alpha value of 1.0.
+ * Returns the number of colors appended (k * dup).
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version January 22, 2016
+ */
+function randomDupColors(k, dup, colors) {
+  for ( i = 0; i < k; i++ ) {
+    var newColor = randomColor();
+    for ( j = 0; j < dup; j++ ) {
+      colors.push( newColor );
+      colors.push( newColor );
+      colors.push( newColor );
+    }
+  }
+  return k * dup;
+}  
+
+/**
+ * Generates k random sets of dup colors  and appends them to the array colors;
+ * That is, it fills colors with k * dup colors, every dup a random color.
+ * The colors are constrained to be between minColor and maxColor.
+ * The component values of minColor and maxColor are clamped between 0.0 and 1.0.
+ * If any component of minColor is greater than the corresponding component
+ * of maxColor, the values of that component are exchanged;
+ * in this case, the result returned may be different than intended.
+ * Returns the number of colors appended (k * dup).
+ *
+ * @author  J. Andrew Whitford Holey
+ * @version February 5, 2016
+ */
+function randomDupColorsMinMax(k, dup, colors, minColor, maxColor) {
+
+  for ( i = 0; i < k; i++ ) {
+    var newColor = randomColorMinMax(minColor, maxColor);
+    for (j = 0; j < dup; j++) {
+      colors.push(newColor);
+      colors.push(newColor);
+      colors.push(newColor);
+    }
+  }
+  return k * dup;
+}
+

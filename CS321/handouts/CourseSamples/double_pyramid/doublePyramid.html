@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Colored Double Pyramid</title>
+
+<!--
+  doublePyramid.html
+
+  Program to draw a double pyramid with a specified number of base vertices
+  and varying colors
+  Adapted from JAWH polygon program, based on
+  Angel & Shreiner 2D Sierpinski Gasket and cube programs
+  by J. Andrew Whitford Holey, January 25, 2016
+-->
+
+
+<!--
+  vertex shader script
+-->
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec4 vColor;
+varying   vec4 fColor;
+
+void main () {
+  fColor       = vColor;
+  gl_Position  = vPosition;
+}
+</script>
+
+
+<!--
+  fragment shader script
+  color all fragments based on interpolated vertex colors
+-->
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying   vec4 fColor;
+
+void main() {
+  gl_FragColor = fColor;
+}
+</script>
+
+
+<!--
+  Source the common scripts and the script for this program
+-->
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="doublePyramid.js"></script>
+</head>
+
+
+<body>
+
+<!--
+  Create the canvas for this program
+-->
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+<form>
+  <br>
+  Number of sides (at least 3):
+  <input id="nsinput" type="number" min="3" max="128"><br>
+  Use arrows to change number of sides or enter number,
+  clicking outside the box, if necessary
+</form>
+
+</body>
+</html>

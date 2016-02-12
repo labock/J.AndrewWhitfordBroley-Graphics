@@ -1,0 +1,84 @@
+//  File: polygon.js
+
+//  Program to draw a regular polygon with a specified number of vertices
+//  Adapted from Angel & Shreiner 2D Sierpinski Gasket program
+//  by J. Andrew Whitford Holey, January 14, 2016
+
+var gl;
+var points;
+var k = 4;
+var program;
+var inputForm;
+
+//  Run this function when the window loads
+window.onload = function init()
+{
+    var canvas = document.getElementById("gl-canvas");
+    inputForm = document.getElementById("nsinput");
+    inputForm.onchange =
+    function () {
+      k = parseInt(inputForm.value);
+      initPoints();
+      setBuffer();
+      render();
+    };
+
+    
+    gl = WebGLUtils.setupWebGL( canvas );
+    if ( !gl ) { alert( "WebGL isn't available" ); }
+
+    //  Configure WebGL
+    gl.viewport( 0, 0, canvas.width, canvas.height );
+    gl.clearColor( 0.85, 0.92, 0.85, 1.0 ); // light green-gray background
+
+    
+    //  Load shaders and initialize attribute buffers
+    program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    gl.useProgram( program );
+
+    // Initialize points, buffer; render
+    initPoints();
+    setBuffer();
+    render();
+};
+
+
+function initPoints() {
+	 points       = [];
+    var origin   = vec2(0.0, 0.0);
+    var start    = vec2(1.0, 0.0);
+    var p1       = start;
+    var theta    = 2.0 * Math.PI / k;
+    
+    for (j = 1; j < k; j++) {
+        var p2 = vec2(Math.cos(j * theta), Math.sin(j * theta));
+        points.push(origin);
+        points.push(p1);
+        points.push(p2);
+        p1 = p2;
+    }
+    points.push(origin);
+    points.push(p1);
+    points.push(start);
+}
+
+function setBuffer() {
+
+    // Load the data into the GPU
+    var bufferId = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+
+    // Associate our shader variables with our data buffer
+    
+    var vPosition = gl.getAttribLocation( program, "vPosition" );
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+
+}
+
+
+function render() {
+    gl.clear( gl.COLOR_BUFFER_BIT );
+    gl.drawArrays( gl.TRIANGLES, 0, points.length );
+}

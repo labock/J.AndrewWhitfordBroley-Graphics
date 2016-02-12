@@ -9,6 +9,11 @@
 //  Helper functions
 //
 
+/**
+ * Converts its list of arguments to an array and returns the array
+ * of arguments;
+ * some of the arguments may themselves be arrays.
+ */
 function _argumentsToArray( args )
 {
     return [].concat.apply( [], Array.prototype.slice.apply(args) );
@@ -16,6 +21,7 @@ function _argumentsToArray( args )
 
 //----------------------------------------------------------------------------
 
+/** Converts degrees to radians */
 function radians( degrees ) {
     return degrees * Math.PI / 180.0;
 }
@@ -25,6 +31,15 @@ function radians( degrees ) {
 //  Vector Constructors
 //
 
+/**
+ * Constructs a 2-element vector with the specified arguments.
+ * The function may have zero, one, or two arguments, which may be in an array:
+ * with zero arguments, it returns the 2-element zero vector;
+ * with one argument, it returns a vector with the argument
+ * as its first elements and zero as its second;
+ * with two arguments, it returns a vector with the first argument
+ * as its first element and the second as its second element.
+ */
 function vec2()
 {
     var result = _argumentsToArray( arguments );
@@ -37,6 +52,18 @@ function vec2()
     return result.splice( 0, 2 );
 }
 
+/**
+ * Constructs a 3-element vector with the specified arguments.
+ * The function may have zero, one, two, or three arguments,
+ * which may be in an array:
+ * with zero arguments, it returns the 3-element zero vector;
+ * with one argument, it returns a vector with the argument
+ * as its first elements and zero as its second and third;
+ * with two arguments, it returns a vector with the first two arguments
+ * as its first and second elements and zero as its third;
+ * with three arguments, it returns a vector with the three arguments
+ * as its elements.
+ */
 function vec3()
 {
     var result = _argumentsToArray( arguments );
@@ -50,6 +77,16 @@ function vec3()
     return result.splice( 0, 3 );
 }
 
+/**
+ * Constructs a 4-element vector with the specified arguments.
+ * The function may have zero to four arguments, which may be in an array:
+ * with zero arguments, it returns the vector [ 0, 0, 0, 1 ];
+ * with one to three arguments, it returns a vector with the argument(s)
+ * as its first elements, one in its last element,
+ * and zero in any remaining elements;
+ * with four arguments, it returns a vector with the four arguments
+ * as its elements.
+ */
 function vec4()
 {
     var result = _argumentsToArray( arguments );
@@ -69,6 +106,17 @@ function vec4()
 //  Matrix Constructors
 //
 
+/**
+ * Constructs a 2 X 2 matrix.
+ * This function may have zero, one, or four arguments:
+ * with zero arguments, it returns the 2 X 2 identity matrix;
+ * with one arguments, it returns a 2 X 2 matrix with the argument
+ * in the principal diagonal and zeros elsewhere;
+ * with four arguments, it returns a 2 X 2 matrix with the arguments
+ * as its elements.
+ * The matrix is represented internally as two 2-element vectors.
+ * The resulting matrix has a "matrix" property which is true.
+ */
 function mat2()
 {
     var v = _argumentsToArray( arguments );
@@ -95,8 +143,20 @@ function mat2()
     return m;
 }
 
+
 //----------------------------------------------------------------------------
 
+/**
+ * Constructs a 3 X 3 matrix.
+ * This function may have zero, one, or nine arguments:
+ * with zero arguments, it returns the 3 X 3 identity matrix;
+ * with one arguments, it returns a 3 X 3 matrix with the argument
+ * in the principal diagonal and zeros elsewhere;
+ * with four arguments, it returns a 3 X 3 matrix with the arguments
+ * as its elements.
+ * The matrix is represented internally as three 3-element vectors.
+ * The resulting matrix has a "matrix" property which is true.
+ */
 function mat3()
 {
     var v = _argumentsToArray( arguments );
@@ -125,8 +185,20 @@ function mat3()
     return m;
 }
 
+
 //----------------------------------------------------------------------------
 
+/**
+ * Constructs a 4 X 4 matrix.
+ * This function may have zero, one, or 16 arguments:
+ * with zero arguments, it returns the 4 X 4 identity matrix;
+ * with one arguments, it returns a 4 X 4 matrix with the argument
+ * in the principal diagonal and zeros elsewhere;
+ * with four arguments, it returns a 4 X 4 matrix with the arguments
+ * as its elements.
+ * The matrix is represented internally as four f-element vectors.
+ * The resulting matrix has a "matrix" property which is true.
+ */
 function mat4()
 {
     var v = _argumentsToArray( arguments );
@@ -162,6 +234,11 @@ function mat4()
 //  Generic Mathematical Operations for Vectors and Matrices
 //
 
+/**
+ * Returns true if u and v are equal vectors or equal matrices,
+ * that is, if they have the same number of elements in the same order
+ * and either both are vectors or both are matrices with the same dimensions.
+ */
 function equal( u, v )
 {
     if ( u.length != v.length ) { return false; }
@@ -186,8 +263,15 @@ function equal( u, v )
     return true;
 }
 
+
 //----------------------------------------------------------------------------
 
+/**
+ * Adds two vectors or matrices and returns the result.
+ * The two parameters u and v must either both be vectors of the same length
+ * or both be matrices of the same dimensions;
+ * the result will be the same length or dimensions as the parameters.
+ */
 function add( u, v )
 {
     var result = [];
@@ -229,6 +313,12 @@ function add( u, v )
 
 //----------------------------------------------------------------------------
 
+/**
+ * Subtracts two vectors or matrices (u minus v) and returns the result.
+ * The two parameters u and v must either both be vectors of the same length
+ * or both be matrices of the same dimensions;
+ * the result will be the same length or dimensions as the parameters.
+ */
 function subtract( u, v )
 {
     var result = [];
@@ -270,8 +360,18 @@ function subtract( u, v )
     }
 }
 
+
 //----------------------------------------------------------------------------
 
+/**
+ * Multiplies two vectors or matrices and returns the result.
+ * The two parameters u and v must either both be vectors of the same length
+ * or both be matrices of compatible dimensions (u must have the same number
+ * of columns as v has rows).
+ * For vectors, the result is the pairwise product of the elements;
+ * for matrices the result is the standard matrix product with the same number
+ * of rows as u and the same number of columns as v.
+ */
 function mult( u, v )
 {
     var result = [];
@@ -316,11 +416,16 @@ function mult( u, v )
     }
 }
 
+
 //----------------------------------------------------------------------------
 //
 //  Basic Transformation Matrix Generators
 //
 
+/**
+ * Produces the 4 X 4 translation matrix for x, y, and z.
+ * The parameters may be either three scalars or a single vec3 vector.
+ */
 function translate( x, y, z )
 {
     if ( Array.isArray(x) && x.length == 3 ) {
@@ -337,8 +442,16 @@ function translate( x, y, z )
     return result;
 }
 
+
 //----------------------------------------------------------------------------
 
+/**
+ * Produces the 4 X 4 rotation matrix for angle degrees around the specified
+ * axis vector, anchored at the origin.
+ * The axis parameter may be specified either as three separate vector
+ * components (x, y, and z) or a single vec3 parameter.
+ * If axis is a zero vector, it will throw an exception on the normalize call.
+ */
 function rotate( angle, axis )
 {
     if ( !Array.isArray(axis) ) {
@@ -359,7 +472,7 @@ function rotate( angle, axis )
         vec4( x*x*omc + c,   x*y*omc - z*s, x*z*omc + y*s, 0.0 ),
         vec4( x*y*omc + z*s, y*y*omc + c,   y*z*omc - x*s, 0.0 ),
         vec4( x*z*omc - y*s, y*z*omc + x*s, z*z*omc + c,   0.0 ),
-        vec4()
+        vec4( )  // 0 0 0 1
     );
 
     return result;
@@ -367,6 +480,10 @@ function rotate( angle, axis )
 
 //----------------------------------------------------------------------------
 
+/**
+ * Produces the 4 X 4 scaling matrix for scale factors x, y, and z.
+ * The parameters may be either three scalars or a single vec3 vector.
+ */
 function scalem( x, y, z )
 {
     if ( Array.isArray(x) && x.length == 3 ) {
@@ -388,6 +505,13 @@ function scalem( x, y, z )
 //  ModelView Matrix Generators
 //
 
+/**
+ * Produces a rotate/translate 4 X 4 matrix that moves the origin to position
+ * eye, orients the -z axis to the vector (at - eye), and orients the
+ * y axis to the vector up.
+ * The three parameters must all be vec3;
+ * eye and at are treated as points, up as a vector.
+ */
 function lookAt( eye, at, up )
 {
     if ( !Array.isArray(eye) || eye.length != 3) {

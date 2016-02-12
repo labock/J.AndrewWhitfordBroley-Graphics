@@ -1,4 +1,4 @@
-// SwissFlag.js
+//  File: polygon.js
 
 //  Program to draw a regular polygon with a specified number of vertices
 //  Adapted from Angel & Shreiner 2D Sierpinski Gasket program
@@ -7,7 +7,6 @@
 var gl;
 var points;
 var k = 4;
-var points;
 var program;
 var inputForm;
 
